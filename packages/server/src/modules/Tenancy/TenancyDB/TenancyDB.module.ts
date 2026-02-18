@@ -26,10 +26,12 @@ export const TenancyDatabaseProxyProvider = ClsModule.forFeatureAsync({
       client: configService.get('tenantDatabase.client'),
       connection: {
         host: configService.get('tenantDatabase.host'),
+        port: configService.get('tenantDatabase.port'),
         user: configService.get('tenantDatabase.user'),
         password: configService.get('tenantDatabase.password'),
         database,
         charset: 'utf8',
+        ...(configService.get('tenantDatabase.ssl') ? { ssl: { rejectUnauthorized: false } } : {}),
       },
       migrations: {
         directory: configService.get('tenantDatabase.migrationsDir'),
