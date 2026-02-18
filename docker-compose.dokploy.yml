@@ -1,0 +1,84 @@
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: packages/server/Dockerfile
+    expose:
+      - '3000'
+    ports:
+      - '3000:3000'
+    depends_on:
+      - redis
+    restart: on-failure
+    environment:
+      # Database
+      - DB_CLIENT=${DB_CLIENT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_CHARSET=${DB_CHARSET}
+      - DB_SSL=${DB_SSL}
+      - SYSTEM_DB_NAME=${SYSTEM_DB_NAME}
+      - TENANT_DB_NAME_PERFIX=${TENANT_DB_NAME_PERFIX}
+
+      # Redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_HOST=redis
+      - QUEUE_PORT=6379
+
+      # Authentication
+      - JWT_SECRET=${JWT_SECRET}
+
+      # Application
+      - BASE_URL=${BASE_URL}
+
+      # Mail
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_SECURE=${MAIL_SECURE}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+
+      # Sign-up restrictions
+      - SIGNUP_DISABLED=${SIGNUP_DISABLED}
+      - SIGNUP_ALLOWED_DOMAINS=${SIGNUP_ALLOWED_DOMAINS}
+      - SIGNUP_ALLOWED_EMAILS=${SIGNUP_ALLOWED_EMAILS}
+      - SIGNUP_EMAIL_CONFIRMATION=${SIGNUP_EMAIL_CONFIRMATION}
+
+      # Gotenberg
+      - GOTENBERG_URL=http://gotenberg:3000
+      - GOTENBERG_DOCS_URL=${GOTENBERG_DOCS_URL}
+
+      # Exchange Rate
+      - EXCHANGE_RATE_SERVICE=${EXCHANGE_RATE_SERVICE}
+      - OPEN_EXCHANGE_RATE_APP_ID=${OPEN_EXCHANGE_RATE_APP_ID}
+
+  webapp:
+    image: bigcapitalhq/webapp:latest
+    expose:
+      - '80'
+    ports:
+      - '80:80'
+    restart: on-failure
+
+  redis:
+    image: redis:7-alpine
+    expose:
+      - '6379'
+    volumes:
+      - redis:/data
+    restart: on-failure
+
+  gotenberg:
+    image: gotenberg/gotenberg:7
+    expose:
+      - '3000'
+    restart: on-failure
+
+volumes:
+  redis:
+    driver: local
