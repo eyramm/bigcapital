@@ -4,8 +4,8 @@ services:
     depends_on:
       - server
       - webapp
-    ports:
-      - '${PUBLIC_PROXY_PORT:-80}:80'
+    expose:
+      - '80'
     volumes:
       - ./docker/envoy/envoy.yaml:/etc/envoy/envoy.yaml
     restart: on-failure
