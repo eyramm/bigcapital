@@ -1,12 +1,21 @@
 services:
+  proxy:
+    image: envoyproxy/envoy:v1.30-latest
+    depends_on:
+      - server
+      - webapp
+    ports:
+      - '${PUBLIC_PROXY_PORT:-80}:80'
+    volumes:
+      - ./docker/envoy/envoy.yaml:/etc/envoy/envoy.yaml
+    restart: on-failure
+
   server:
     build:
       context: ./
       dockerfile: packages/server/Dockerfile
     expose:
       - '3000'
-    ports:
-      - '3000:3000'
     depends_on:
       - redis
     restart: on-failure
@@ -61,8 +70,6 @@ services:
     image: bigcapitalhq/webapp:latest
     expose:
       - '80'
-    ports:
-      - '80:80'
     restart: on-failure
 
   redis:
